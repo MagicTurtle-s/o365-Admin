@@ -1,11 +1,9 @@
-# o365-Admin MCP Roadmap
+# o365-Admin Roadmap
 
 ## Current Status
-- [x] MCP server with 4 base tools implemented
-- [x] Graph API skill fully documented
-- [x] SharePoint sites resource fully documented
-- [x] Dependencies installed and TypeScript compiles
-- [x] Server starts successfully
+- [x] Azure AD App Registration configured
+- [x] Authentication verified working
+- [x] Two deployment options available: MCP Server or Skill+Scripts
 
 ## Phase 1: Build & Test (Complete)
 - [x] `npm install` - Dependencies installed
@@ -20,8 +18,37 @@
 - [x] Admin consent granted
 - [x] Credentials verified - authentication successful
 
-## Phase 3: Configure MCP in Claude Code (Next)
-Run from the project directory:
+## Phase 3: Choose Deployment Option
+
+### Option A: Skill + Scripts (Recommended)
+Portable, on-demand O365 admin via `/o365` slash command. No MCP configuration needed.
+
+**Install:**
+```bash
+cd skill-package && ./install.sh
+```
+
+**Configure credentials:**
+```bash
+cp ~/.claude/skills/o365/.env.example ~/.claude/skills/o365/.env
+# Edit .env with your Azure AD credentials
+```
+
+**Use in Claude Code:**
+```
+/o365
+> List all users in the tenant
+```
+
+**Pros:**
+- Works from any project via `/o365` command
+- No MCP configuration needed
+- Portable - just copy the skill folder
+- On-demand - only loaded when you invoke it
+
+### Option B: MCP Server
+Traditional MCP integration with dedicated tools.
+
 ```bash
 claude mcp add o365-admin node dist/index.js \
   -e AZURE_CLIENT_ID=<your-client-id> \
@@ -29,24 +56,39 @@ claude mcp add o365-admin node dist/index.js \
   -e AZURE_TENANT_ID=<your-tenant-id>
 ```
 
-Or add to `~/.claude/settings.json` manually.
+**Pros:**
+- Native tool integration
+- Structured responses
+- Better for dedicated O365 admin sessions
 
-## Phase 4: Complete Resource Documentation (Optional)
-Fill in TODO sections in scaffolded resource files:
+## Architecture Comparison
 
-| File | TODOs | Priority |
-|------|-------|----------|
-| `resources/graph/teams.md` | 20 | Medium |
-| `resources/graph/users.md` | 25 | Medium |
-| `resources/graph/mail.md` | 23 | Medium |
-| `resources/powerplatform/flows.md` | 20 | Low |
-| `resources/powerplatform/environments.md` | 19 | Low |
-| `skills/powerplatform-api.md` | 11 | Low |
+| Aspect | Skill + Scripts | MCP Server |
+|--------|-----------------|------------|
+| Activation | `/o365` slash command | Auto-loads at session start |
+| Scope | Global (works anywhere) | Project or global |
+| Tools | Bash scripts | Native MCP tools |
+| Configuration | Copy files + .env | `claude mcp add` |
+| Portability | High | Medium |
 
-## Architecture
-The MCP exposes only 4 base tools. Claude reads skill/resource documentation to learn API patterns, then executes calls via generic executors:
+## File Structure
 
-- `list_skills` - Returns available skills and resources
-- `read_skill` - Loads documentation into context
-- `graph_api_call` - Execute Microsoft Graph API calls
-- `powerplatform_api_call` - Execute Power Platform API calls
+```
+o365-Admin/
+├── src/                      # MCP server source
+│   └── index.ts
+├── dist/                     # Compiled MCP server
+│   └── index.js
+├── skill-package/            # Skill + Scripts deployment
+│   ├── install.sh            # Installer script
+│   ├── o365/
+│   │   ├── README.md         # Skill documentation
+│   │   ├── get-token.sh      # Token management
+│   │   ├── graph-call.sh     # Graph API executor
+│   │   ├── powerplatform-call.sh
+│   │   └── .env.example
+│   └── commands/
+│       └── o365.md           # Slash command
+├── skills/                   # API pattern documentation
+└── resources/                # Endpoint-specific docs
+```
