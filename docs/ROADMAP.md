@@ -13,24 +13,23 @@
 - [x] `npm run dev` - Server starts successfully
 - [x] `dist/index.js` exists
 
-## Phase 2: Azure AD Setup (Required for API calls)
-User must complete in Azure Portal:
-1. Create App Registration named `o365-Admin-MCP`
-2. Create client secret (save immediately - only shown once)
-3. Add API permissions:
-   - **SharePoint**: Sites.ReadWrite.All, Sites.Manage.All
-   - **Teams**: Team.Create, TeamSettings.ReadWrite.All, Channel.Create, ChannelSettings.ReadWrite.All
-   - **Users**: Directory.Read.All, Directory.ReadWrite.All, User.ReadWrite.All, Group.ReadWrite.All
-   - **Mail**: Mail.ReadWrite, Mail.Send, Calendars.ReadWrite
-4. Grant admin consent
-5. Note Client ID, Tenant ID, and Secret
+## Phase 2: Azure AD Setup (Complete)
+- [x] App Registration created
+- [x] Client secret generated
+- [x] API permissions configured
+- [x] Admin consent granted
+- [x] Credentials verified - authentication successful
 
-## Phase 3: Configure MCP in Claude Code
+## Phase 3: Configure MCP in Claude Code (Next)
+Run from the project directory:
 ```bash
-claude mcp add o365-admin node dist/index.js
+claude mcp add o365-admin node dist/index.js \
+  -e AZURE_CLIENT_ID=<your-client-id> \
+  -e AZURE_CLIENT_SECRET=<your-client-secret> \
+  -e AZURE_TENANT_ID=<your-tenant-id>
 ```
 
-Or add to settings manually with environment variables for credentials.
+Or add to `~/.claude/settings.json` manually.
 
 ## Phase 4: Complete Resource Documentation (Optional)
 Fill in TODO sections in scaffolded resource files:
